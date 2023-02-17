@@ -49,7 +49,151 @@ Note the concept is a bit different from Flux and Redux
 
 ## Overview
 
-Examples
+
+# Code overview
+
+Here is a sample of simple store pattern
+
+```ts
+import { LiteStore } from "memento.react"
+
+const delay = (timeout: number) =>
+    new Promise(resolve => setTimeout(resolve, timeout))
+
+const simpleState = {
+    count: 0,
+    history: [],
+    isLoading: false,
+}
+
+@meta({ name: "SimpleStore" })
+export class SimpleStore extends LiteStore<typeof simpleState> {
+    constructor() {
+        super(simpleState)
+    }
+
+    async countUpAsync() {
+        this.setState({
+            ...this.state,
+            isLoading: true,
+        })
+
+        await delay(500)
+
+        const state = this.state
+        const count = state.count + 1
+
+        this.setState({
+            ...state,
+            history: [...state.history, count],
+            count,
+            isLoading: false,
+        })
+    }
+
+    setCount(num: number) {
+        this.setState({
+            ...this.state, count: num,
+            history: [...this.state.history, num]
+        })
+    }
+
+    async delay(timeout: number) {
+        await new Promise(resolve => setTimeout(resolve, timeout))
+    }
+}
+
+
+```
+
+### Usage
+
+```tsx
+import { 
+    useObserver,
+    useDispatch,
+} from "memento.react"
+import React,  {useState } from "react"
+
+export const SimpleStoreView = () => {dedux
+    // store state
+    const counter = useObserver(SimpleStore)
+    const dispatch = useDispatch(SimpleStore)
+    // store state with sliced by selector
+    const history = useObserver(SimpleStore, state => state.history)
+
+    // local state
+    const [toAdd, setToAdd] = useState(1)
+
+    const handleClick = () => {
+        dispatch(store => store.countUpAsync())
+    }
+
+    const handleSet = () => {
+        dispatch(store => store.setCount(counter.count + toAdd))
+        setToAdd(1)
+    }
+
+    return (
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center"
+        }}>
+            <h2>Counter</h2>
+
+            
+            <p>{counter.count}</p>
+
+            <button onClick={handleClick}>
+                Count UP
+            </button>
+
+            <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "260px"
+            }}>
+                <p>{counter.count}</p>
+                <div style={{ flex: "1 1 auto" }} />
+                <p>+</p>
+                <div style={{ flex: "1 1 auto" }} />
+                <input
+                    type="number"
+                    value={toAdd}
+                    onChange={e => setToAdd(Number(e.target.value))}
+                />
+                <button onClick={handleSet}>
+                    Calc
+                </button>
+            </div>
+
+            <h4>Loading : {counter.isLoading ? "YES" : "NO"}</h4>
+
+            <h4>History</h4>
+            <div
+                style={{
+                    height: "300px",
+                    width: "400px",
+                    overflowY: "auto",
+                    background: "rgba(0,0,0,0.08)",
+                    textAlign:"center",
+                }}
+            >
+                {
+                    !history.length && <p>No history</p>
+                }
+                {
+                    history.map(h =>
+                        <p key={h}>history: {h}</p>
+                    )
+                }
+            </div>
+        </div>
+    )
+}
+```
 
 ### The currently supported framework bindings are as follows
 

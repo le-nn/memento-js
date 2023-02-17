@@ -51,7 +51,6 @@ It is a concept that summarizes the features with side effects, used with Depend
 The tutorials implemented in each language and simple console application are following
 
 [Typescript](./Tutorial.ts.md)
-[C#](./Tutorial.cs.md)
 
 # Practical usage on the Framework
 
@@ -59,4 +58,3 @@ In reality, most of them will be used together with the UI framework.
 Describes the concepts common to all languages ​​and frameworks is following.
 
 [React](./React/GettingStandard.md)
-[Blazor](./Blazor/GettingStandard.md)
